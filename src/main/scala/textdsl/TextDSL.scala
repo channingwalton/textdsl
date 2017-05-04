@@ -1,6 +1,7 @@
 package textdsl
 
 object TextDSL extends App {
+
   type Document = Vector[String]
 
   type SimpleTransformation = String ⇒ String
@@ -14,7 +15,6 @@ object TextDSL extends App {
   type Columns = Vector[Column]
 
   type ColumnTransform = Columns ⇒ Columns
-
 
   // helpful stuff
 
@@ -38,8 +38,6 @@ object TextDSL extends App {
 
   def lines: Transformation = (_: String).lines.to[Vector]
 
-  // more challenging
-
   def index(s: String): Search[Int] =
     (l: String) => {
       val index = l.indexOf(s)
@@ -61,8 +59,8 @@ object TextDSL extends App {
   def joinColumns: Columns ⇒ Document =
     (_: Columns).map(a => a.mkString)
 
-  // ensures columns have the same lengths - padding with empty strings if necessary
-  def normaliseColumnSize: ColumnTransform = { (columns: Columns) ⇒
+  // ensures columns have the same width - padding smaller columns with empty strings if necessary
+  def normaliseColumnWidth: ColumnTransform = { (columns: Columns) ⇒
     val numCols = columns.maxBy(_.size).size
     columns.map((v: Column) => if (v.size < numCols) v.padTo(numCols, "") else v)
   }
@@ -70,23 +68,23 @@ object TextDSL extends App {
   def transposeColumns: ColumnTransform =
     _.transpose
 
-  def padColumns: ColumnTransform = { (columns: Columns) ⇒
-    columns.map((col: Column) => {
-      val max: Int = col.map(_.length).max
+  def padColumns: ColumnTransform =
+    (columns: Columns) ⇒
+      columns.map((col: Column) => {
+        val max: Int = col.map(_.length).max
 
-      def pad(l: String) = l + " " * (max - l.length)
+        def pad(l: String) = l + " " * (max - l.length)
 
-      col.map(pad)
-    })
-  }
+        col.map(pad)
+      })
 
   def alignColumns(s: String): Transformation =
     columnise(s) andThen
-      normaliseColumnSize andThen
-      transposeColumns andThen
-      padColumns andThen
-      transposeColumns andThen
-      joinColumns
+    normaliseColumnWidth andThen
+    transposeColumns andThen
+    padColumns andThen
+    transposeColumns andThen
+    joinColumns
 
   val sample = Vector(
     "---|--",
