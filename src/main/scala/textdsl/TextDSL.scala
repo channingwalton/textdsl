@@ -22,14 +22,18 @@ trait TextDSL {
 
   // helpful stuff
 
-  implicit def lift(e: StringTransformation): Transformation = (document: Document) ⇒ document.map(e)
+  implicit def lift(e: StringTransformation): Transformation =
+    (document: Document) ⇒ document.map(e)
 
-  implicit def liftOneToMany(f: String ⇒ Document): Transformation = (_: Document).flatMap(f)
+  implicit def liftOneToMany(f: String ⇒ Document): Transformation =
+    (_: Document).flatMap(f)
 
-  implicit def toDocument(f: String): Document = document(f)
+  implicit def toDocument(f: String): Document =
+    document(f)
 
   implicit class FunctionSyntax[A, B](f: A ⇒ B) {
     def o[C](g: B ⇒ C): A ⇒ C = f andThen g
+
     def ∘[C](g: B ⇒ C): A ⇒ C = f andThen g
   }
 
@@ -41,19 +45,26 @@ trait TextDSL {
 
   // the api
 
-  def replaceAll(regex: String, replacement: String): StringTransformation = (_: String).replaceAll(regex, replacement)
+  def replaceAll(regex: String, replacement: String): StringTransformation =
+    (_: String).replaceAll(regex, replacement)
 
-  def deleteAll(s: String): StringTransformation = replaceAll(s, "")
+  def deleteAll(s: String): StringTransformation =
+    replaceAll(s, "")
 
-  def append(s: String): StringTransformation = (_: String) + s
+  def append(s: String): StringTransformation =
+    (_: String) + s
 
-  def splitAt(regex: String): Transformation = (_: String).split(regex).to[Vector]
+  def splitAt(regex: String): Transformation =
+    (_: String).split(regex).to[Vector]
 
-  def lines: Transformation = (_: String).lines.to[Vector]
+  def lines: Transformation =
+    (_: String).lines.to[Vector]
 
-  def sort: Transformation = (_: Document).sorted
+  def sort: Transformation =
+    (_: Document).sorted
 
-  def sortCaseInsensitive: Transformation = (_: Document).sortWith(_.toLowerCase < _.toLowerCase)
+  def sortCaseInsensitive: Transformation =
+    (_: Document).sortWith(_.toLowerCase < _.toLowerCase)
 
   def index(s: String): Search[Int] =
     (l: String) => {
@@ -67,6 +78,7 @@ trait TextDSL {
         val index = a.indexOf(delimiter, 1)
         if (index < 0) Vector(a) else Vector(a.substring(0, index)) ++ help(a.substring(index))
       }
+
       help(l)
     }
 
@@ -101,12 +113,12 @@ trait TextDSL {
 
   def alignColumns(s: String): Transformation =
     columnise(s) ∘
-    normaliseColumnWidth ∘
-    transposeColumns ∘
-    padColumns ∘
-    transposeColumns ∘
-    joinColumns ∘
-    trimLines
+      normaliseColumnWidth ∘
+      transposeColumns ∘
+      padColumns ∘
+      transposeColumns ∘
+      joinColumns ∘
+      trimLines
 }
 
 object TextDSL extends TextDSL
