@@ -13,12 +13,13 @@ Given some text delimited by |
 We can create a function to align the columns by using some combinators:
 
 ```scala
-    columnise("|") andThen
-    normaliseColumnWidth andThen
-    transposeColumns andThen
-    padColumns andThen
-    transposeColumns andThen
-    joinColumns
+    columnise(s) ∘
+    normaliseColumnWidth ∘
+    transposeColumns ∘
+    padColumns ∘
+    transposeColumns ∘
+    joinColumns ∘
+    trimLines
 ````
 So
 
