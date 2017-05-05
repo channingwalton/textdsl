@@ -1,6 +1,6 @@
 # textdsl
 An experimental combinator library for manipulating text.
-
+w
 ## Examples
 
 Given some text delimited by |

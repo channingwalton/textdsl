@@ -54,12 +54,6 @@ trait TextDSL {
   def append(s: String): StringTransformation =
     (_: String) + s
 
-  def splitAt(regex: String): Transformation =
-    (_: String).split(regex).to[Vector]
-
-  def lines: Transformation =
-    (_: String).lines.to[Vector]
-
   def sort: Transformation =
     (_: Document).sorted
 
