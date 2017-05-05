@@ -1,6 +1,10 @@
 package textdsl
 
-object TextDSL extends App {
+class LineFeed(val lf: String) extends AnyVal
+
+trait TextDSL {
+
+  implicit val LF: LineFeed = new LineFeed("\n")
 
   type Document = Vector[String]
 
@@ -29,11 +33,11 @@ object TextDSL extends App {
     def ∘[C](g: B ⇒ C): A ⇒ C = f andThen g
   }
 
-  def document(text: String, separators: Array[Char] = Array('\n')): Document =
-    text.split(separators).toVector
+  def document(text: String)(implicit lineFeed: LineFeed): Document =
+    text.split(lineFeed.lf).toVector
 
-  def toText(d: Document, eol: String = "\n"): String =
-    d.mkString(eol)
+  def toText(d: Document)(implicit lineFeed: LineFeed): String =
+    d.mkString(lineFeed.lf)
 
   // the api
 
@@ -104,3 +108,5 @@ object TextDSL extends App {
     joinColumns ∘
     trimLines
 }
+
+object TextDSL extends TextDSL
