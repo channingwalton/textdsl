@@ -29,8 +29,6 @@ object TextDSL extends App {
     def ∘[C](g: B ⇒ C): A ⇒ C = f andThen g
   }
 
-  def print(d: Document) = println(d.mkString("\n"))
-
   def document(text: String, separators: Array[Char] = Array('\n')): Document =
     text.split(separators).toVector
 
@@ -48,6 +46,10 @@ object TextDSL extends App {
   def splitAt(regex: String): Transformation = (_: String).split(regex).to[Vector]
 
   def lines: Transformation = (_: String).lines.to[Vector]
+
+  def sort: Transformation = (_: Document).sorted
+
+  def sortCaseInsensitive: Transformation = (_: Document).sortWith(_.toLowerCase < _.toLowerCase)
 
   def index(s: String): Search[Int] =
     (l: String) => {
