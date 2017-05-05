@@ -4,7 +4,7 @@ object TextDSL extends App {
 
   type Document = Vector[String]
 
-  type SimpleTransformation = String ⇒ String
+  type StringTransformation = String ⇒ String
 
   type Transformation = Document ⇒ Document
 
@@ -18,21 +18,32 @@ object TextDSL extends App {
 
   // helpful stuff
 
-  implicit def lift(e: SimpleTransformation): Transformation = (document: Document) ⇒ document.map(e)
+  implicit def lift(e: StringTransformation): Transformation = (document: Document) ⇒ document.map(e)
 
   implicit def liftOneToMany(f: String ⇒ Document): Transformation = (_: Document).flatMap(f)
 
-  implicit def toVector(f: String): Document = Vector(f)
+  implicit def toDocument(f: String): Document = document(f)
 
-  def write(d: Document) = println(d.mkString("\n"))
+  implicit class FunctionSyntax[A, B](f: A ⇒ B) {
+    def o[C](g: B ⇒ C): A ⇒ C = f andThen g
+    def ∘[C](g: B ⇒ C): A ⇒ C = f andThen g
+  }
+
+  def print(d: Document) = println(d.mkString("\n"))
+
+  def document(text: String, separators: Array[Char] = Array('\n')): Document =
+    text.split(separators).toVector
+
+  def toText(d: Document, eol: String = "\n"): String =
+    d.mkString(eol)
 
   // the api
 
-  def replaceAll(regex: String, replacement: String): SimpleTransformation = (_: String).replaceAll(regex, replacement)
+  def replaceAll(regex: String, replacement: String): StringTransformation = (_: String).replaceAll(regex, replacement)
 
-  def deleteAll(s: String): SimpleTransformation = replaceAll(s, "")
+  def deleteAll(s: String): StringTransformation = replaceAll(s, "")
 
-  def append(s: String): SimpleTransformation = (_: String) + s
+  def append(s: String): StringTransformation = (_: String) + s
 
   def splitAt(regex: String): Transformation = (_: String).split(regex).to[Vector]
 
@@ -78,21 +89,16 @@ object TextDSL extends App {
         col.map(pad)
       })
 
+  def trimLines: Transformation =
+    (document: Document) ⇒
+      document.map(_.trim)
+
   def alignColumns(s: String): Transformation =
-    columnise(s) andThen
-    normaliseColumnWidth andThen
-    transposeColumns andThen
-    padColumns andThen
-    transposeColumns andThen
-    joinColumns
-
-  val sample = Vector(
-    "---|--",
-    "---|--|----|--",
-    "-|--",
-    "-|||||")
-
-  write(alignColumns("|") apply sample)
-
-  val found: Option[Int] = index("----") apply "hi----bye"
+    columnise(s) ∘
+    normaliseColumnWidth ∘
+    transposeColumns ∘
+    padColumns ∘
+    transposeColumns ∘
+    joinColumns ∘
+    trimLines
 }
