@@ -22,14 +22,9 @@ trait TextDSL {
 
   // helpful stuff
 
-  implicit def lift(e: StringTransformation): Transformation =
-    (document: Document) ⇒ document.map(e)
-
-  implicit def liftOneToMany(f: String ⇒ Document): Transformation =
-    (_: Document).flatMap(f)
-
-  implicit def toDocument(f: String): Document =
-    document(f)
+  implicit class StringSyntax(s: String) {
+    def document: Document = TextDSL.document(s)
+  }
 
   implicit class FunctionSyntax[A, B](f: A ⇒ B) {
     def o[C](g: B ⇒ C): A ⇒ C = f andThen g

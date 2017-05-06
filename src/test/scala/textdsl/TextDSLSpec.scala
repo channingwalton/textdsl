@@ -10,13 +10,13 @@ class TextDSLSpec extends FlatSpec with MustMatchers with TextDSL {
       """|---x--
          |---x--x----x--
          |-x--
-         |-xxxxx""".stripMargin
+         |-xxxxx""".stripMargin.document
 
     val expected: Document =
       """|---x--
          |---x--x----x--
          |-  x--
-         |-  x  x    x  xx""".stripMargin
+         |-  x  x    x  xx""".stripMargin.document
 
     toText(alignColumns("x")(doc)) mustEqual toText(expected)
   }

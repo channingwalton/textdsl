@@ -24,7 +24,7 @@ We can create a function to align the columns by using some combinators:
 So
 
 ```scala
-alignColumns("|")(theAboveText)
+alignColumns("|")(theAboveText.document)
 ```
 
 Gives
